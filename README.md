@@ -1,13 +1,39 @@
-# Custom github action template
+# Draft CLI action
 
-Custom Github action template to build complex task that should take many steps or that are not available on market
-place.
+Draft is a CLI tool to help you create and manage AWS Lambda functions and services in a monorepo structure.
+It provides commands to create new services and lambdas, as well as to invoke them locally.
 
-## Instructions
+## Requirements
 
-Review and adjust the next files to finish your action setup:
+- Ubuntu amd64 runners
 
-- action.yml
-- Dockerfile
-- package.json
-- .github/workflows/release.yml
+## Installation
+
+```yaml
+steps:
+  # ...
+
+  - name: Install draft cli
+    uses: Drafteame/draft-cli-action@main
+    with:
+      access_token: ${{ secrets.ACCESS_TOKEN }}
+```
+
+## Usage
+
+### Setup Databases
+
+First locate yourself inside the service folder of the monorepo, the execute next command:
+
+```yaml
+steps:
+  # ...
+
+  - name: Install draft cli
+    uses: Drafteame/draft-cli-action@main
+    with:
+      access_token: ${{ secrets.ACCESS_TOKEN }}
+
+  - name: Setup local database templates
+    run: draft local:setup
+```

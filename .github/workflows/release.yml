@@ -2,9 +2,9 @@ name: Release
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 
 env:
   GIT_USER_EMAIL: ${{ secrets.GIT_EMAIL }}
@@ -23,7 +23,7 @@ jobs:
       version: ${{ steps.cz.outputs.version }}
     steps:
       - name: Check out
-        uses: actions/checkout@v4.1.5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: '${{ secrets.ACCESS_TOKEN }}'
@@ -36,9 +36,9 @@ jobs:
           git config --local pull.ff only
 
       - name: Set up Python
-        uses: actions/setup-python@v5.1.0
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: 3.12
 
       - name: Create bump and changelog
         id: cz
@@ -59,32 +59,3 @@ jobs:
 
       - name: Print Version
         run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
-
-  build:
-    runs-on: ubuntu-latest
-    needs:
-      - bump_version
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          logout: false
-
-      - name: Set repo name
-        run: |
-          repo=$(echo "ghcr.io/${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-          echo "REPO=$repo" >> $GITHUB_ENV
-
-      - name: Build and push
-        run: |
-          docker buildx build --platform linux/amd64,linux/arm64 -t ${{ env.REPO }}:latest --push .
-          docker buildx build --platform linux/amd64,linux/arm64 -t ${{ env.REPO }}:${{ needs.bump_version.outputs.version }} --push .

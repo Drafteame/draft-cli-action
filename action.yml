@@ -1,20 +1,60 @@
-name: 'custom-action-template'
+name: 'draft-cli-action'
 
 description: ''
 
 branding:
-  icon: database
+  icon: terminal
   color: blue
 
 inputs:
-  action:
-    description: 'action to perform'
+  version:
+    description: 'version to install cli'
+    default: 'latest'
+    required: false
+  access_token:
+    description: 'GitHub access token'
     required: true
 
-# outputs:
-#   out_val:
-#     description: 'some output value'
-
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: composite
+  steps:
+    - name: 'Set version'
+      shell: bash
+      id: version
+      run: |
+        get_latest_version() {
+          local response
+          response=$(curl -s -w "%{http_code}" -H "Authorization: token ${{ inputs.access_token }}" \
+              "https://api.github.com/repos/Drafteame/draft/releases/latest")
+
+          local http_code=${response: -3}
+          local body=${response:0:${#response}-3}
+
+          echo "$body" | grep '"tag_name":' | sed -E 's/.*"tag_name": "([^"]+)".*/\1/'
+        }
+
+        if [[ "${{ inputs.version }}" == "latest" ]]; then
+          version=$(get_latest_version)
+        else
+          version="${{ inputs.version }}"
+        fi
+
+        # remove v prefix
+        version=${version#v}
+
+        echo "version=$version" >> $GITHUB_OUTPUT
+
+    - name: 'Install draft-cli'
+      shell: bash
+      run: |
+        echo "${{ inputs.access_token }}" | gh auth login --with-token
+
+        gh release download ${{ steps.version.outputs.version }} \
+          --repo Drafteame/draft \
+          --pattern "*linux_amd64*"
+
+        # untar the downloaded file
+        tar -xzf draft_linux_amd64_${{ steps.version.outputs.version }}.tar.gz
+
+        # move the binary to /usr/local/bin
+        sudo mv draft /usr/local/bin/draft
