@@ -49,7 +49,7 @@ runs:
       run: |
         echo "${{ inputs.access_token }}" | gh auth login --with-token
 
-        gh release download ${{ steps.version.outputs.version }} \
+        gh release download v${{ steps.version.outputs.version }} \
           --repo Drafteame/draft \
           --pattern "*linux_amd64*"
 
