@@ -18,6 +18,8 @@ runs:
     - name: 'Set version'
       shell: bash
       id: version
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         if [[ "${{ inputs.version }}" == "latest" ]]; then
           version=$(gh release view --repo Drafteame/draft --json tagName -q .tagName)
