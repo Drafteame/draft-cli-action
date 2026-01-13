@@ -1,3 +1,11 @@
+## v0.1.3 (2026-01-13)
+
+
+- Merge pull request #4 from Drafteame/chore/add-gh-token
+- Chore/add gh token
+- chore: add secret access token
+- chore: add gh token
+
 ## v0.1.2 (2026-01-13)
 
 
