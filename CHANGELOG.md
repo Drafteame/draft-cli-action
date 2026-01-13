@@ -1,3 +1,11 @@
+## v0.1.2 (2026-01-13)
+
+
+- Merge pull request #3 from Drafteame/fix/set-version
+- fix: set version
+- chore: remove input access token
+- fix: set version
+
 ## v0.1.1 (2025-03-28)
 
 
