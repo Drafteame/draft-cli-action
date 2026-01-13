@@ -11,6 +11,9 @@ inputs:
     description: 'version to install cli'
     default: 'latest'
     required: false
+  access_token:
+    description: 'GitHub access token'
+    required: true
 
 runs:
   using: composite
@@ -19,7 +22,7 @@ runs:
       shell: bash
       id: version
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.access_token }}
       run: |
         if [[ "${{ inputs.version }}" == "latest" ]]; then
           version=$(gh release view --repo Drafteame/draft --json tagName -q .tagName)
